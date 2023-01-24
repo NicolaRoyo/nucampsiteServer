@@ -1,4 +1,3 @@
-const { response } = require('express');
 const express = require('express');
 const Campsite = require('../models/campsite');
 
@@ -22,7 +21,7 @@ campsiteRouter.route('/')
         res.setHeader('Content-Type', 'application/json');
         res.json(campsite);
     })
-    .catch(err => (next(err)))
+    .catch(err => next(err));
 })
 .put((req, res) => {
     res.statusCode = 403;
@@ -107,7 +106,7 @@ campsiteRouter.route('/:campsiteId/comments')
             return next(err);
         }
     })
-    .catch(err => (next(err)))
+    .catch(err => next(err));
 })
 .put((req, res) => {
     res.statusCode = 403;
