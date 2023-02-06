@@ -13,7 +13,7 @@ favoriteRouter.route('/')
     Favorite.find({ user: req.user._id })
     .populate('user')
     .populate('campsites')
-    .then(favorites => {
+    .then((favorites) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json'); 
         res.json(favorites);
@@ -25,11 +25,12 @@ favoriteRouter.route('/')
     .then((favorite) => {
         if (favorite) {
             req.body.forEach(fave => {
-                if(!favorite.campsites.includes(req.params.campsiteId)) 
-                favorite.campsites.push(req.params.campsiteId)
+                if(!favorite.campsites.includes(fave._id)) {
+                favorite.campsites.push(fave._id);
+                }
             });
             favorite.save()
-            .then(favorite => {
+            .then((favorite) => {
                 console.log('Favorite Created', favorite);
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
@@ -39,13 +40,12 @@ favoriteRouter.route('/')
         } else {
             Favorite.create({
                 user: req.user._id, 
-                campsites: [req.params.campsiteId]
+                campsites: req.body
             }) 
-            .then(favorite => {
+            .then((favorite) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
                 res.json(favorite);
-
             })
             .catch(err => next(err)); 
         }
@@ -59,7 +59,7 @@ favoriteRouter.route('/')
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Favorite.findOneAndDelete({user:req.user._id})
-    .then(favorite => {
+    .then((favorite) => {
         if(favorite) {
             res.statusCode = 200;
             res.setHeader('Content-Type', 'application/json');
@@ -82,29 +82,29 @@ favoriteRouter.route('/:campsiteId')
 })
 .post(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
     Favorite.findOne({user: req.user._id })
-    .then(favorite => {
+    .then((favorite) => {
         if(favorite) {
             if(!favorite.campsites.includes(req.params.campsiteId)) {
             favorite.campsites.push(req.params.campsiteId);
-            favorite.save()
-            .then(favorite => {
-                console.log('Favorite Created', favorite);
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(favorite);
-            })
-            .catch(err => next(err)); 
-            } else {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'text/plain');
-                res.end('That campsite is already in the list of favorites!');
-            }
+                favorite.save()
+                .then((favorite) => {
+                    console.log('Favorite Created', favorite);
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(favorite);
+                })
+                .catch(err => next(err)); 
+                } else {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'text/plain');
+                    res.end('That campsite is already in the list of favorites!')
+                }
         } else {
             Favorite.create({
                 user: req.user._id, 
                 campsites: [req.params.campsiteId]
             }) 
-            .then(favorite => {
+            .then((favorite) => {
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
                 res.json(favorite);
@@ -120,12 +120,12 @@ favoriteRouter.route('/:campsiteId')
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser,  (req, res, next) => { 
     Favorite.findOne({user:req.user._id})
-    .then(favorite => {
+    .then((favorite) => {
         const campsiteIndex = favorite.campsites.indexOf(req.params.campsiteId)
         if(campsiteIndex !== -1) {
             favorite.campsites.splice(campsiteIndex, 1)
             favorite.save()
-            .then(favorite => {
+            .then((favorite) => {
                 console.log('Favorite Deleted', favorite);
                 res.statusCode = 200;
                 res.setHeader('Content-Type', 'application/json');
